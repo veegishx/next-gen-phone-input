@@ -65,6 +65,15 @@
       .error {
         color: red;
       }
+      .links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: fixed;
+      }
     </style>
   </head>
   <body>
@@ -83,6 +92,16 @@
         </div>
       </form>
       <p id="result"></p>
+    </div>
+    <div class="links">
+      <p style="color: greenyellow">
+        Source Code:
+        <a
+          style="color: #2d9eff"
+          href="https://github.com/veegishx/next-gen-phone-input"
+          >Github</a
+        >
+      </p>
     </div>
     <script>
       const input = document.querySelector("input");
