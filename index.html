@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mauritius Phone Number Validator</title>
+    <style>
+      h1 {
+        color: white;
+        text-align: center;
+      }
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+        height: 100vh;
+        position: relative;
+      }
+
+      .generated-number {
+        font-size: 45px;
+        color: green;
+      }
+
+      body:hover {
+        cursor: url("cursor-1.png") 10 10, auto;
+      }
+
+      .number {
+        position: absolute;
+        color: white;
+        font-size: 24px;
+        font-family: Arial, sans-serif;
+        pointer-events: auto;
+      }
+      .container {
+        display: flex;
+        width: 100%;
+        margin: 0px auto;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      input:disabled {
+        height: 40px;
+        width: 250px;
+        border-radius: 4px;
+        border: none;
+        background: rgb(199, 199, 199);
+        padding: 0px 10px;
+        cursor: not-allowed;
+      }
+      .validate-btn {
+        height: 40px;
+        border-radius: 4px;
+        border: none;
+        background: #2d9eff;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .success {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Enter your phone number</h1>
+      <form>
+        <div class="form">
+          <input
+            disabled
+            type="number"
+            placeholder="Please enter a phone number"
+          />
+          <button class="validate-btn" type="button" onclick="validateNumber()">
+            Validate
+          </button>
+        </div>
+      </form>
+      <p id="result"></p>
+    </div>
+    <script>
+      const input = document.querySelector("input");
+      const result = document.getElementById("result");
+      const createFallingNumber = () => {
+        const numberElement = document.createElement("div");
+        numberElement.className = "number";
+        const numberValue = Math.floor(Math.random() * 10);
+        numberElement.textContent = numberValue; // Random number from 0-9
+
+        const startX = Math.random() * window.innerWidth;
+        numberElement.style.left = `${startX}px`;
+        numberElement.style.top = `-30px`; // Start slightly above the screen
+        // numberElement.style.border = `4px solid red`;
+
+        numberElement.setAttribute("data-number", numberValue);
+
+        // Handle capturing numbers
+        numberElement.addEventListener("mouseover", function () {
+          console.log("GOT IT: ", input);
+          input.value += numberElement.textContent;
+          numberElement.remove();
+        });
+
+        document.body.appendChild(numberElement);
+
+        const fallDuration = 4000 + Math.random() * 3000; // Between 4-7 seconds
+
+        const animation = numberElement.animate(
+          [
+            { transform: `translateY(0px)` },
+            { transform: `translateY(${window.innerHeight + 50}px)` },
+          ],
+          {
+            duration: fallDuration,
+            easing: "linear",
+          }
+        );
+
+        animation.onfinish = () => numberElement.remove(); // Remove element when animation ends
+      };
+
+      const startFallingNumbers = () => {
+        setInterval(createFallingNumber, 200); // Create a new number every 200ms
+      };
+
+      const explodeNumbers = () => {
+        const numbers = document.querySelectorAll(".number");
+        numbers.forEach((number) => {
+          const flag = Math.floor(Math.random() * (20 - 1 + 1) + 1);
+          console.log("numbers: ", { number: number.textContent, flag });
+          if (flag == number.textContent || flag == number.textContent + 1) {
+            number.innerHTML = `<img src='explosion.gif' alt='explosion' width='100' height='100'>`;
+            setTimeout(() => {
+              number.remove();
+            }, 500);
+          }
+        });
+      };
+
+      const startExplodeNumbers = () => {
+        setInterval(explodeNumbers, 200); // Create a new number every 200ms
+      };
+
+      // Adjust for screen resize
+      window.addEventListener("resize", () => {
+        const numbers = document.querySelectorAll(".number");
+        numbers.forEach((number) => number.remove()); // Clear all numbers on resize
+      });
+
+      const validateNumber = () => {
+        // Regex for Mauritian phone numbers +230 xxx xxx
+        const mauritiusPattern = /^(\+230[-\s]?)?(\d{3}[-\s]?\d{4})$/;
+        const valid = mauritiusPattern.test(input.value);
+        if (valid) {
+          result.classList.remove("error");
+          result.classList.add("success");
+          result.textContent = `The number ${input.value} is a valid 🇲🇺 (MU) phone number!`;
+        } else {
+          result.classList.remove("success");
+          result.classList.add("error");
+          result.textContent = `The number ${input.value} is an invalid 🇲🇺 (MU) phone number!`;
+        }
+        console.log(valid);
+      };
+
+      startFallingNumbers();
+      startExplodeNumbers();
+    </script>
+  </body>
+</html>
