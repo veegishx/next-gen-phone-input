@@ -33,6 +33,10 @@
         font-family: Arial, sans-serif;
         pointer-events: auto;
       }
+      .nuke {
+        position: absolute;
+        pointer-events: auto;
+      }
       .container {
         display: flex;
         width: 100%;
@@ -74,9 +78,28 @@
         bottom: 0;
         position: fixed;
       }
+      #nuke-overlay {
+        display: none;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+      }
+      .nuke-overlay__gif {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
+    <div id="nuke-overlay">
+      <img
+        class="nuke-overlay__gif"
+        src="nuke_explosion.gif"
+        alt="nuke animation"
+      />
+    </div>
     <div class="container">
       <h1>Enter your phone number</h1>
       <form>
@@ -106,6 +129,8 @@
     <script>
       const input = document.querySelector("input");
       const result = document.getElementById("result");
+      const nukeOverlay = document.getElementById("nuke-overlay");
+
       const createFallingNumber = () => {
         const numberElement = document.createElement("div");
         numberElement.className = "number";
@@ -121,7 +146,6 @@
 
         // Handle capturing numbers
         numberElement.addEventListener("mouseover", function () {
-          console.log("GOT IT: ", input);
           input.value += numberElement.textContent;
           numberElement.remove();
         });
@@ -130,7 +154,7 @@
 
         const fallDuration = 4000 + Math.random() * 3000; // Between 4-7 seconds
 
-        const animation = numberElement.animate(
+        const numberAnimation = numberElement.animate(
           [
             { transform: `translateY(0px)` },
             { transform: `translateY(${window.innerHeight + 50}px)` },
@@ -141,18 +165,69 @@
           }
         );
 
-        animation.onfinish = () => numberElement.remove(); // Remove element when animation ends
+        numberAnimation.onfinish = () => numberElement.remove(); // Remove element when animation ends
+      };
+
+      const createFallingNukes = () => {
+        const nukeElement = document.createElement("img");
+        nukeElement.className = "nuke";
+        nukeElement.src = "nuke.png";
+
+        const startX = Math.random() * window.innerHeight;
+        const nukeElementStartX = Math.random() * window.innerHeight;
+
+        nukeElement.style.left = `${startX}px`;
+        nukeElement.style.top = `-30px`;
+        // numberElement.style.border = `4px solid red`;
+
+        // Handle capturing numbers
+        nukeElement.addEventListener("mouseover", function () {
+          nukeOverlay.style.display = "block";
+          nukeElement.remove();
+
+          setTimeout(() => {
+            nukeOverlay.remove();
+          }, 2000);
+
+          const animateEndScreen = document.body.animate(
+            [{ backgroundColor: red }],
+            {
+              duration: 5000,
+              easing: "linear",
+            }
+          );
+        });
+
+        document.body.appendChild(nukeElement);
+
+        const fallDuration = 4000 + Math.random() * 3000; // Between 4-7 seconds
+
+        const nukeAnimation = nukeElement.animate(
+          [
+            { transform: `translateY(0px)` },
+            { transform: `translateY(${window.innerHeight + 50}px)` },
+          ],
+          {
+            duration: fallDuration,
+            easing: "linear",
+          }
+        );
+
+        nukeAnimation.onfinish = () => nukeElement.remove(); // Remove nuke when animation ends
       };
 
       const startFallingNumbers = () => {
         setInterval(createFallingNumber, 200); // Create a new number every 200ms
       };
 
+      const startFallingNukes = () => {
+        setInterval(createFallingNukes, 4000); // Create a new number every 200ms
+      };
+
       const explodeNumbers = () => {
         const numbers = document.querySelectorAll(".number");
         numbers.forEach((number) => {
           const flag = Math.floor(Math.random() * (20 - 1 + 1) + 1);
-          console.log("numbers: ", { number: number.textContent, flag });
           if (flag == number.textContent || flag == number.textContent + 1) {
             number.innerHTML = `<img src='explosion.gif' alt='explosion' width='100' height='100'>`;
             setTimeout(() => {
@@ -172,23 +247,30 @@
         numbers.forEach((number) => number.remove()); // Clear all numbers on resize
       });
 
-      const validateNumber = () => {
-        // Regex for Mauritian phone numbers +230 xxx xxx
-        const mauritiusPattern = /^(\+230[-\s]?)?(\d{3}[-\s]?\d{4})$/;
-        const valid = mauritiusPattern.test(input.value);
-        if (valid) {
-          result.classList.remove("error");
-          result.classList.add("success");
-          result.textContent = `The number ${input.value} is a valid 🇲🇺 (MU) phone number!`;
-        } else {
-          result.classList.remove("success");
-          result.classList.add("error");
-          result.textContent = `The number ${input.value} is an invalid 🇲🇺 (MU) phone number!`;
-        }
-        console.log(valid);
-      };
+      /*************  ✨ Windsurf Command ⭐  *************/
+      /**
+       * Validate a phone number against the regex pattern for Mauritian phone numbers +230 xxx xxx
+       * @return {void}
+       */
+      /*******  36dd7622-bc3f-4dbf-95e2-b46d13f353c3  *******/ const validateNumber =
+        () => {
+          // Regex for Mauritian phone numbers +230 xxx xxx
+          const mauritiusPattern = /^230\d{7}$/;
+          const valid = mauritiusPattern.test(input.value);
+          if (valid) {
+            result.classList.remove("error");
+            result.classList.add("success");
+            result.textContent = `The number ${input.value} is a valid 🇲🇺 (MU) phone number!`;
+          } else {
+            result.classList.remove("success");
+            result.classList.add("error");
+            result.textContent = `The number ${input.value} is an invalid 🇲🇺 (MU) phone number!`;
+          }
+          console.log(valid);
+        };
 
       startFallingNumbers();
+      startFallingNukes();
       startExplodeNumbers();
     </script>
   </body>
